@@ -139,7 +139,7 @@ var boundFunction = bind(testThis, ctx);
 console.log(boundFunction(100)); // x=2, a= 100*/
 
 function bind(fn, context) {
-    return function() {// (*)
+    return function() {
         return fn.apply(context, arguments);
     };
 }
