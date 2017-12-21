@@ -41,7 +41,6 @@
             transition: left 1.5s linear;
         }
         .moved {
-            transition: left 1.5s linear;
             left: calc(100% - 100px);
         }
         
@@ -54,6 +53,9 @@
         }
         .alert strong {
             text-transform: uppercase;
+        }
+        #alert-template {
+            display: none;
         }
 
         #btn_up {
@@ -112,6 +114,10 @@
 </head>
 <body>
 <div id="alerts"></div>
+<div id="alert-template"><div class="alert">
+    <a href="#" class="close" title="close">&times;</a>
+    </div>
+</div>
 
 <button id="btn_up" title="Вверх"><span class="glyphicon glyphicon-arrow-up"></span></button>
 
@@ -131,39 +137,31 @@
 <br />
 
 <select class="form-control">
-    <option>Добавить в начало</option>
-    <option>Добавить в середину</option>
-    <option>Добавить в конец</option>
+    <option value="first">Добавить в начало</option>
+    <option value="middle">Добавить в середину</option>
+    <option value="last">Добавить в конец</option>
 </select>
-<button class="button btn btn-success">Нажать</button>
+<button id="add-div" class="button btn btn-success">Нажать</button>
 <div id="container"></div>
 
 <script>
+    // script for task #1
     var container = document.getElementById('container');
-    var counter = 1;
-    var button = document.querySelector('button.btn-success');
+    var button = document.getElementById('add-div');
 
     button.addEventListener("click", function() {
-        var insertContent = '<div><h4>Заголовок #'+ counter +'</h4><p>текст текст текст</p></div>'; //generate inner html with new title number
-        var select = document.querySelector('select.form-control');
-        select = select.options[select.selectedIndex].text; //define position option
-        if (select === "Добавить в конец") {
-            container.insertAdjacentHTML('beforeEnd', insertContent);
+        var insertContent = document.createElement('div');
+        insertContent.innerHTML = '<h4>Заголовок #'+ (container.children.length + 1) +'</h4><p>текст текст текст</p>';
+        var select = document.querySelector('select.form-control').value;
+        if (select === "last") {
+            container.appendChild(insertContent);
         }
-        else if (select === "Добавить в начало") {
-            container.insertAdjacentHTML('afterBegin', insertContent);
+        else if (select === "first") {
+            container.insertBefore(insertContent, container.firstChild);
         }
         else {// in the middle
-            var middle = parseInt(counter/2);
-            //console.log("mid = " + middle);
-            if (counter < 3) { //no middle position, insert to the start
-                container.insertAdjacentHTML('afterBegin', insertContent);
-            }
-            else {
-                container.children[middle].insertAdjacentHTML('beforeBegin', insertContent);
-            }
+            container.insertBefore(insertContent, container.children[Math.round(container.children.length/2)]);
         }
-        counter++;
     });
 </script>
 
@@ -178,11 +176,10 @@
 <div class="play"></div>
 
 <script>
-    var button2 = document.getElementById('go');
-    var moving = document.querySelector('.play');
-    button2.addEventListener("click", function() {
+    // script for task #2
+    document.getElementById('go').addEventListener("click", function() {
         event.preventDefault();
-        moving.classList.toggle('moved');
+        document.querySelector('.play').classList.toggle('moved');
     });
 </script>
 
@@ -198,47 +195,42 @@ Alert должен плавно появляться в верхнем прав�
 
 <input type="text" id="alert-text" class="form-control">
 
-<button id="success-alert" class="button btn btn-success">Success</button>
-<button class="button btn btn-info">Info</button>
-<button class="button btn btn-warning">Warning</button>
-<button class="button btn btn-danger">Danger</button>
+<button class="button alert-btn btn btn-success" value="success">Success</button>
+<button class="button alert-btn btn btn-info" value="info">Info</button>
+<button class="button alert-btn btn btn-warning" value="warning">Warning</button>
+<button class="button alert-btn btn btn-danger" value="danger">Danger</button>
 <script>
+    // script for task #3
     var alerts = document.getElementById('alerts');
-    var alertCounter = 1;
 
     // Show Alert
     function showAlert(alertType) {
-        var message = document.getElementById('alert-text').value;
-        /*console.log('7');*/
-        var insertAlert = '<div id="alert_' + alertCounter + '" class="alert ' +  alertType + '"><a class="close" data-dismiss="' + alertCounter +'">×</a><strong>'+ alertType.slice(6) +'!</strong> ' + message + '</div>';
-        alerts.insertAdjacentHTML('afterBegin', insertAlert);
-        document.getElementById('alert-text').value = null;
-//        console.log('alert_' + alertCounter);
+        //clone alert template
+        var insertAlert = document.getElementById('alert-template').firstChild.cloneNode(true);
+        //modify alert by adding class and content
+        insertAlert.classList.add('alert-'+alertType);
+        insertAlert.innerHTML += '<strong>' + alertType + '!</strong>' + document.getElementById('alert-text').value;
+        //clean form input text
+        document.getElementById('alert-text').value = '';
+        //create new alert
+        var item = alerts.insertBefore(insertAlert, alerts.firstChild);
+        //auto delete in 10s
         setTimeout(function() {
-            document.querySelector('.alert').remove();
+            if (item) {item.remove();}
         }, 10000);
-        var closeX = document.querySelector('.close'), data = closeX.dataset;
-        closeX.addEventListener("click", function() {
+        //delete manual with button
+        document.querySelector('.close').addEventListener("click", function() {
             event.preventDefault();
-//            console.log(data.dismiss);
-            document.getElementById('alert_'+data.dismiss).remove();
+            this.parentElement.remove();
         });
-        alertCounter++;
     }
-
     //Add on click listeners with parameters to different buttons
-    document.querySelector('.btn-info').addEventListener("click", function () {
-        showAlert('alert-info');
-    });
-    document.querySelector('.btn-warning').addEventListener("click", function () {
-        showAlert('alert-warning');
-    });
-    document.querySelector('.btn-danger').addEventListener("click", function () {
-        showAlert('alert-danger');
-    });
-    document.querySelector('#success-alert').addEventListener("click", function () {
-        showAlert('alert-success');
-    });
+    var alertLink = document.querySelectorAll('.alert-btn');
+    for (var i = 0; i < alertLink.length; i++) {
+        alertLink[i].addEventListener("click", function () {
+            showAlert(this.value);
+        });
+    }
 </script>
     </li>
     <li>
@@ -268,8 +260,6 @@ function scrollFunction() {
     }
 }
 function TopscrollTo() {
-    /*document.body.scrollTop = 0;
-    document.documentElement.scrollTop = 0;*/
     if(window.scrollY!=0)
     {
         setTimeout(function() {
@@ -295,10 +285,12 @@ function TopscrollTo() {
         <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />...
 <script>
 // script for task #5
+
 var square = document.querySelectorAll('.dragable');
 for (var i = 0, len = square.length; i < len; i++) {
     // drag and drop element
-    square[i].onmousedown = function(e) {
+    var obj = square[i];
+    obj.onmousedown = function(e) {
 
         var target = e.target;
         if (!target.classList.contains('dragable')) return false;
@@ -331,7 +323,7 @@ for (var i = 0, len = square.length; i < len; i++) {
             moveAt(e);
         };
 
-        document.onmouseup = function() {
+        target.onmouseup = function() {
             //delete '.move' class
             target.classList.toggle('move');
             document.onmousemove = null;
@@ -339,6 +331,27 @@ for (var i = 0, len = square.length; i < len; i++) {
         //e prevent default
         return false;
     };
+
+    obj.addEventListener('touchmove', function(e) {
+        var touch = e.targetTouches[0];
+        var coords = e.target.getBoundingClientRect();
+        var boxCoords = document.querySelector('.box').getBoundingClientRect();
+        e.target.style.zIndex = 1000;
+
+        var newX = touch.pageX - pageXOffset - boxCoords.left;
+        e.target.style.left = Math.max(10, Math.min(newX, boxCoords.width - coords.width - 10)) + 'px';
+
+        var newY = touch.pageY - pageYOffset - boxCoords.top;
+        e.target.style.top = Math.max(10, Math.min(newY, boxCoords.height - coords.height - 10)) + 'px';
+
+        e.preventDefault();
+    }, false);
+    obj.addEventListener('touchstart', function(e) {
+        e.target.classList.toggle('move');
+    });
+    obj.addEventListener('touchend', function(e) {
+        e.target.classList.toggle('move');
+    });
 }
 //e prevent default
 document.ondragstart = function() {
