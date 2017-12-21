@@ -1,0 +1,356 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Task 1</title>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    
+    <style>
+        .tasks {
+            padding: 20px;
+            padding-left: 40px;
+        }
+        .tasks li {
+            position: relative;
+        }
+        
+        .form-control {
+            width: 465px;
+            margin-bottom: 15px;
+        }
+        .button {
+            font: 2em Arial,sans-serif;
+        }
+        
+        .item {
+            background-color: #eee;
+            border-radius: 5px;
+            padding: 4px 10px;
+            margin-top: 10px;
+        }
+        .play{
+            width: 100px;
+            height: 100px;
+            background-color: #369;
+            border-radius: 100px;
+            position: absolute;
+            top: 120px;
+            left: 0;
+            transition: left 1.5s linear;
+        }
+        .moved {
+            transition: left 1.5s linear;
+            left: calc(100% - 100px);
+        }
+        
+        #alerts {
+            z-index: 100;
+            position: absolute;
+            width: 450px;
+            top: 20px;
+            right: 20px;
+        }
+        .alert strong {
+            text-transform: uppercase;
+        }
+
+        #btn_up {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            right: 30px; /* Place the button 30px from the right */
+            z-index: 90;
+            background-color: rgba(155,89,182,0.8); /* Set a background color */
+            border: 1px solid #8e44ad;
+            color: white;
+            cursor: pointer;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: large;
+        }
+
+        #btn_up:hover {
+            background-color: #8e44ad;
+        }
+        
+        .box {
+            height: 400px;
+            background-color: #e1e2e3;
+            border-color: #000;
+            position: relative;
+        }
+        .dragable {
+            position: absolute;
+            width: 50px;
+            height: 50px;            
+            cursor: pointer;
+            z-index: 1;
+        }
+        .red {
+            background-color: #f00;
+        }
+        .green {
+            background-color: #0b0;
+        }
+        .blue {
+            background-color: #00f;
+        }
+        .purple {
+            background-color: #874de4;
+        }
+        .move {
+            cursor: move;
+            opacity: 0.5;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+    </style>
+    
+</head>
+<body>
+<div id="alerts"></div>
+
+<button id="btn_up" title="Вверх"><span class="glyphicon glyphicon-arrow-up"></span></button>
+
+<ol class="tasks">
+    <li>
+
+<h4>
+При нажатии на кнопку, добавлять в <code>div</code> с идентификатором <code>container</code> фрагмент разметки в выбраную позицию.
+В заголовок писать порядковый номер вставляемого элемента
+</h4>
+<pre>
+ &lt;div class="item"&gt; 
+ &lt;h4&gt;Заголовок #&lt;/h4&gt;
+ &lt;p&gt;текст текст текст&lt;/p&gt;
+ &lt;/div&gt;
+</pre>
+<br />
+
+<select class="form-control">
+    <option>Добавить в начало</option>
+    <option>Добавить в середину</option>
+    <option>Добавить в конец</option>
+</select>
+<button class="button btn btn-success">Нажать</button>
+<div id="container"></div>
+
+<script>
+    var container = document.getElementById('container');
+    var counter = 1;
+    var button = document.querySelector('button.btn-success');
+
+    button.addEventListener("click", function() {
+        var insertContent = '<div><h4>Заголовок #'+ counter +'</h4><p>текст текст текст</p></div>'; //generate inner html with new title number
+        var select = document.querySelector('select.form-control');
+        select = select.options[select.selectedIndex].text; //define position option
+        if (select === "Добавить в конец") {
+            container.insertAdjacentHTML('beforeEnd', insertContent);
+        }
+        else if (select === "Добавить в начало") {
+            container.insertAdjacentHTML('afterBegin', insertContent);
+        }
+        else {// in the middle
+            var middle = parseInt(counter/2);
+            //console.log("mid = " + middle);
+            if (counter < 3) { //no middle position, insert to the start
+                container.insertAdjacentHTML('afterBegin', insertContent);
+            }
+            else {
+                container.children[middle].insertAdjacentHTML('beforeBegin', insertContent);
+            }
+        }
+        counter++;
+    });
+</script>
+
+    </li>
+    <li style="height: 220px;">
+
+<h4>При нажатии на ссылку, равномерно перемещать HTML-элемент с классом <code>play</code> вправо, при повторном нажатии - перемещать влево.</h4>
+<br />
+
+
+<a id="go" href="/" class="button btn btn-success">Поехали!</a>
+<div class="play"></div>
+
+<script>
+    var button2 = document.getElementById('go');
+    var moving = document.querySelector('.play');
+    button2.addEventListener("click", function() {
+        event.preventDefault();
+        moving.classList.toggle('moved');
+    });
+</script>
+
+    </li>
+    <li>
+<h4>При нажатии на кнопку выдавать bootstrap-alert соответствующего типа c текстом из поля ввода.
+HTML код всплывающих элементов можно посмотреть по <a href="https://www.w3schools.com/bootstrap/bootstrap_alerts.asp">ссылке</a>.
+Alert должен плавно появляться в верхнем правом углу, при нажатии на крестик - исчезать. Так же alert'ы должны закрываться автоматичесски через 10 секунд.
+Если несколько раз подряд нажать на кнопку - то сообщения выстраиваются один под другим.
+</h4>
+<br />
+
+
+<input type="text" id="alert-text" class="form-control">
+
+<button id="success-alert" class="button btn btn-success">Success</button>
+<button class="button btn btn-info">Info</button>
+<button class="button btn btn-warning">Warning</button>
+<button class="button btn btn-danger">Danger</button>
+<script>
+    var alerts = document.getElementById('alerts');
+    var alertCounter = 1;
+
+    // Show Alert
+    function showAlert(alertType) {
+        var message = document.getElementById('alert-text').value;
+        /*console.log('7');*/
+        var insertAlert = '<div id="alert_' + alertCounter + '" class="alert ' +  alertType + '"><a class="close" data-dismiss="' + alertCounter +'">×</a><strong>'+ alertType.slice(6) +'!</strong> ' + message + '</div>';
+        alerts.insertAdjacentHTML('afterBegin', insertAlert);
+        document.getElementById('alert-text').value = null;
+//        console.log('alert_' + alertCounter);
+        setTimeout(function() {
+            document.querySelector('.alert').remove();
+        }, 10000);
+        var closeX = document.querySelector('.close'), data = closeX.dataset;
+        closeX.addEventListener("click", function() {
+            event.preventDefault();
+//            console.log(data.dismiss);
+            document.getElementById('alert_'+data.dismiss).remove();
+        });
+        alertCounter++;
+    }
+
+    //Add on click listeners with parameters to different buttons
+    document.querySelector('.btn-info').addEventListener("click", function () {
+        showAlert('alert-info');
+    });
+    document.querySelector('.btn-warning').addEventListener("click", function () {
+        showAlert('alert-warning');
+    });
+    document.querySelector('.btn-danger').addEventListener("click", function () {
+        showAlert('alert-danger');
+    });
+    document.querySelector('#success-alert').addEventListener("click", function () {
+        showAlert('alert-success');
+    });
+</script>
+    </li>
+    <li>
+<h4><b class="h2 text-danger">*</b>
+Сделать кнопочку <i class="text-info">scroll to top</i>, она должна появляться когда пользователь проскролил страницу на размер одного видимого экрана.
+Кнопочку нужно аккуратно стилизовать.
+</h4>
+<br />
+
+<script>
+// script for task #4
+var screenHeight = window.innerHeight; // 1 screen height
+var scrollBtn = document.getElementById('btn_up');
+scrollBtn.addEventListener("click", function() {
+    event.preventDefault();
+    TopscrollTo();
+});
+
+window.onscroll = function() {
+    scrollFunction()
+};
+function scrollFunction() {
+    if (document.body.scrollTop > screenHeight || document.documentElement.scrollTop > screenHeight) {
+        scrollBtn.style.display = "block";
+    } else {
+        scrollBtn.style.display = "none";
+    }
+}
+function TopscrollTo() {
+    /*document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;*/
+    if(window.scrollY!=0)
+    {
+        setTimeout(function() {
+            window.scrollTo(0,window.scrollY-30);
+            TopscrollTo();
+        }, 20);
+    }
+}
+</script>
+    </li>
+    <li>
+<h4><b class="h2 text-danger">**</b>
+Реализовать перемещение элементов внутри контейнера. Элементы нельзя ставить ближе <i class="text-info">10px</i> к границе контейнера.
+Во время перемещения элемента ему должен присваиваться класс <code>move</code>. Перетаскивание эелементов должно так де работать и на мобильных устройствах.</h4>
+<br />
+
+<div class="panel box">
+<div class="dragable red" style="left: 250px;top: 28px;"></div>
+<div class="dragable green" style="left: 30px;top: 50px;"></div>
+<div class="dragable blue" style="left: 350px;top: 287px;"></div>
+<div class="dragable purple move" style="left: 70px;top: 28px;"></div>
+</div>
+        <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />...
+<script>
+// script for task #5
+var square = document.querySelectorAll('.dragable');
+for (var i = 0, len = square.length; i < len; i++) {
+    // drag and drop element
+    square[i].onmousedown = function(e) {
+
+        var target = e.target;
+        if (!target.classList.contains('dragable')) return false;
+        //add '.move' class
+        target.classList.toggle('move');
+        //Returns a TextRectangle object that specifies the bounding rectangle of the target
+        var coords = target.getBoundingClientRect();
+        // the bounding rectangle of the parent box
+        var boxCoords = document.querySelector('.box').getBoundingClientRect();
+        // cursor shifting:
+        //pageY, pageX - position of mouse relative to the document, considering scroll
+        //pageYOffset, pageXOffset - returns the pixels the current document has been scrolled from the upper left corner of the window
+        var shiftX = e.pageX - pageXOffset - coords.left;
+        var shiftY = e.pageY - pageYOffset - coords.top;
+        document.querySelector('.box').appendChild(target);
+
+        moveAt(e);
+
+        target.style.zIndex = 1000; // above all elements
+
+        function moveAt(e) {
+            var newX = e.pageX - pageXOffset - boxCoords.left - shiftX;
+            target.style.left = Math.max(10, Math.min(newX, boxCoords.width - coords.width - 10)) + 'px';
+
+            var newY = e.pageY - pageYOffset - boxCoords.top - shiftY;
+            target.style.top = Math.max(10, Math.min(newY, boxCoords.height - coords.height - 10)) + 'px';
+        }
+
+        document.onmousemove = function(e) {
+            moveAt(e);
+        };
+
+        document.onmouseup = function() {
+            //delete '.move' class
+            target.classList.toggle('move');
+            document.onmousemove = null;
+        };
+        //e prevent default
+        return false;
+    };
+}
+//e prevent default
+document.ondragstart = function() {
+    return false;
+};
+</script>
+    </li>
+</ol>
+<br><br><br>
+</body>
+</html>
+
+
+
+
