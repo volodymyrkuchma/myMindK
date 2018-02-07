@@ -1,0 +1,63 @@
+.stadium {
+    background: url(../img/trava.png);
+    margin: 100px auto 0;
+    width: 1155px;
+    position: relative;
+    padding: 0 10px;
+}
+.track {
+    position: relative;
+    height: 110px;
+}
+.track + .track {
+    margin-top: 50px;
+}
+.player {
+    height: 100px;
+    width: 110px;
+    position: absolute;
+    top: 5px;
+    left: 0;
+    background: center no-repeat;
+    transition: left linear 2s;
+}
+.zaec {
+    background-image: url(../img/zaec.png);
+}
+.volk {
+    background-image: url(../img/volk.png);
+}
+.barrier {
+    position: absolute;
+    width: 55px;
+    height:110px;
+    background: center no-repeat;
+    top: 5px;
+}
+.kamen {
+    background-image: url(../img/kamen.png);
+    background-position: center 75px;
+}
+.yagoda {
+    background-image: url(../img/yagoda.png) ;
+}
+
+.popup {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 100;
+    background: rgba(255,255,255,0.85);
+    /*padding-top: 5vh;*/
+}
+.popup .p-text {
+    text-align: center;
+}
+.popup #winner {
+    height: 100px;
+    width: 110px;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: block;
+    margin-left: calc(50% - 55px);
+}
