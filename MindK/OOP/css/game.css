@@ -61,3 +61,6 @@
     display: block;
     margin-left: calc(50% - 55px);
 }
+.hidden {
+    display: none !important;
+}
